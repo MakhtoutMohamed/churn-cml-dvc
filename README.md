@@ -32,9 +32,9 @@ azure://dvc-storage/churn-cml-dvc
 
 ```bash
 python -m venv .venv
-. .venv/Scripts/activate  # Windows PowerShell: .\.venv\Scripts\Activate.ps1
+dans windows : .\.venv\Scripts\Activate.ps1 #sur linux . .venv/Scripts/activate
 pip install -r requirements.txt
-pip install "dvc[azure]==3.63.0"
+pip install "dvc[azure]==3.66.0"
 ```
 
 Initialiser Git + DVC:
