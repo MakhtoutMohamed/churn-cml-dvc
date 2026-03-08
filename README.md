@@ -1,4 +1,4 @@
-# Atelier 4 - MLOps de bout en bout (Azure Blob au lieu de S3)
+# MLOps de bout en bout utilisant Azure Blob au lieu de S3
 
 Ce projet applique le flux du TP:
 - Git pour versionner le code,
@@ -12,15 +12,15 @@ Ce projet applique le flux du TP:
 - Python 3.11
 - Compte GitHub
 - Compte Azure avec un `Storage Account`
-- Un container Blob dedie pour DVC (ex: `dvc-storage`)
+- Un container Blob dedie pour DVC `dvc-storage`
 
-## 2) Creer le stockage Azure (equivalent S3)
+## 2) Creer le stockage Azure
 
-1. Azure Portal -> `Storage accounts` -> creer un compte.
-2. Dans ce compte, creer un container Blob prive (ex: `dvc-storage`).
+1. Azure Portal -> `Storage accounts` -> creer un compte
+2. Dans ce compte, creer un container Blob prive `dvc-storage`
 3. Recuperer soit:
-- `Connection string` (recommande), ou
-- `Account name` + `Account key`.
+- `Connection string` ou
+- `Account name` + `Account key`
 
 Remote DVC cible:
 
@@ -48,19 +48,15 @@ git commit -m "Init Git and DVC"
 
 Configurer le remote Azure:
 
+windows powershell : $env:AZURE_STORAGE_CONNECTION_STRING='DefaultEndpointsProtocol=https;AccountName=xxxxx;AccountKey=xxxxx==;EndpointSuffix=core.windows.net'
+linux export AZURE_STORAGE_CONNECTION_STRING='DefaultEndpointsProtocol=https;AccountName=xxxxx;AccountKey=xxxxx==;EndpointSuffix=core.windows.net'
+
 ```bash
 dvc remote add -d myremote azure://dvc-storage/churn-cml-dvc
 dvc remote modify myremote connection_string "${AZURE_STORAGE_CONNECTION_STRING}"
 ```
 
-Alternative sans connection string:
-
-```bash
-dvc remote modify myremote account_name "<storage-account-name>"
-dvc remote modify myremote account_key "<storage-account-key>"
-```
-
-Important: ne jamais versionner les credentials.
+- ne jamais versionner les credentials.
 
 ```bash
 git rm --cached .dvc/config.local
@@ -81,13 +77,13 @@ dvc push
 
 ## 5) Configurer GitHub Secrets
 
-Dans `Settings -> Secrets and variables -> Actions`, ajouter:
+Dans `Settings -> Secrets and variables -> Actions`, ajouter 'new repository secret':
 
-- `AZURE_STORAGE_CONNECTION_STRING`
-- `AZURE_STORAGE_ACCOUNT` (optionnel)
-- `AZURE_STORAGE_KEY` (optionnel)
+-* `AZURE_STORAGE_CONNECTION_STRING`
+-opt: `AZURE_STORAGE_ACCOUNT`
+-opt: `AZURE_STORAGE_KEY`
 
-`GITHUB_TOKEN` est fourni automatiquement par GitHub Actions.
+`GITHUB_TOKEN` est fourni automatiquement par GitHub Actions
 
 ## 6) Pipeline CI/CD
 
@@ -104,7 +100,7 @@ Il fait:
 6. `dvc push` des artefacts vers Azure Blob,
 7. publication du rapport CML (`metrics.txt` + `conf_matrix.png`).
 
-## 7) Commandes utiles
+=> pull request : https://github.com/MakhtoutMohamed/churn-cml-dvc/pull/1
 
 ```bash
 dvc status
@@ -112,3 +108,5 @@ dvc pull
 dvc push
 dvc doctor
 ```
+
+## autre alternative est MinIO

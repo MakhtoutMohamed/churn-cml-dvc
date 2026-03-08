@@ -24,8 +24,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Set up CML
-        uses: iterative/setup-cml@v2
+      - name: Install CML CLI
+        run: npm install -g @dvcorg/cml
 
       - name: Install Python dependencies
         run: |
@@ -36,8 +36,8 @@ jobs:
       - name: DVC pull (restore data/models from Azure Blob)
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
-          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+          #AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+          #AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
         run: |
           dvc pull -v
           ls -la data || true
@@ -46,8 +46,6 @@ jobs:
       - name: Train and push artifacts with DVC
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
-          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
         run: |
           python script.py
           dvc add data models
