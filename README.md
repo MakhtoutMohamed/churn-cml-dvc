@@ -1,4 +1,4 @@
-# Atelier 4 - MLOps de bout en bout (Azure Blob au lieu de S3)
+# MLOps de bout en bout utilisant Azure Blob au lieu de S3
 
 Ce projet applique le flux du TP:
 - Git pour versionner le code,
