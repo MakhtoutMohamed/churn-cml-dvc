@@ -1,0 +1,71 @@
+name: churn-azure-dvc-cml
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up CML
+        uses: iterative/setup-cml@v2
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install "dvc[azure]==3.63.0"
+
+      - name: DVC pull (restore data/models from Azure Blob)
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+        run: |
+          dvc pull || echo "No remote cache yet"
+
+      - name: Train and push artifacts with DVC
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+        run: |
+          python script.py
+          dvc add data models
+
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add data.dvc models.dvc dvc.lock metrics.txt conf_matrix.png || true
+          git commit -m "Update DVC metadata and metrics [skip ci]" || echo "nothing to commit"
+          git push || echo "push skipped"
+
+          dvc push
+
+      - name: Publish CML report
+        if: github.event_name == 'pull_request'
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## Metrics" > report.md
+          cat metrics.txt >> report.md
+          echo "" >> report.md
+          echo "## Confusion Matrix" >> report.md
+          echo "![](./conf_matrix.png)" >> report.md
+          cml comment create report.md
