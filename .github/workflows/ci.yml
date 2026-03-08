@@ -39,7 +39,9 @@ jobs:
           AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
         run: |
-          dvc pull || echo "No remote cache yet"
+          dvc pull -v
+          ls -la data || true
+          test -f data/dataset.csv
 
       - name: Train and push artifacts with DVC
         env:
