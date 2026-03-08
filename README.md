@@ -100,7 +100,8 @@ Il fait:
 6. `dvc push` des artefacts vers Azure Blob,
 7. publication du rapport CML (`metrics.txt` + `conf_matrix.png`).
 
-=> pull request : https://github.com/MakhtoutMohamed/churn-cml-dvc/pull/1
+=> pull request 1: https://github.com/MakhtoutMohamed/churn-cml-dvc/pull/1
+=> pull request 2: https://github.com/MakhtoutMohamed/churn-cml-dvc/pull/2
 
 ```bash
 dvc status
@@ -110,3 +111,8 @@ dvc doctor
 ```
 
 ## autre alternative est MinIO
+
+![](prv/1.png)
+![](prv/2.png)
+![](prv/3.png)
+![](prv/4.png)
